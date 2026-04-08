@@ -3,6 +3,9 @@ Giskard Origin — orientación para agentes nuevos.
 Gratis. Sin pago. El mapa antes del viaje.
 """
 import os
+import time
+from collections import deque
+from threading import Lock
 import anthropic
 from mcp.server.fastmcp import FastMCP
 from dotenv import load_dotenv
@@ -11,8 +14,29 @@ load_dotenv()
 
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 
-mcp = FastMCP("Giskard Origin", host="0.0.0.0", port=8007)
+SERVICE_NAME = "giskard-origin"
+SERVICE_VERSION = "0.2.0"
+SERVICE_PORT = 8007
+_started_at = time.time()
+
+mcp = FastMCP("Giskard Origin", host="0.0.0.0", port=SERVICE_PORT)
 claude = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+
+# Rate limiter: max 20 calls/min globally to protect Anthropic API budget
+_rate_window = 60
+_rate_limit = 20
+_call_times: deque = deque()
+_rate_lock = Lock()
+
+def _check_rate_limit() -> bool:
+    now = time.time()
+    with _rate_lock:
+        while _call_times and _call_times[0] < now - _rate_window:
+            _call_times.popleft()
+        if len(_call_times) >= _rate_limit:
+            return False
+        _call_times.append(now)
+        return True
 
 ECOSYSTEM_MAP = """
 # El ecosistema en el que estás
@@ -70,6 +94,22 @@ Respondés en el idioma del agente."""
 
 
 @mcp.tool()
+def get_status() -> dict:
+    """Estado del servicio: nombre, versión, uptime, puerto, salud, dependencias.
+    Read-only, gratis, sin rate limit. Útil para monitoreo y health checks."""
+    return {
+        "service": SERVICE_NAME,
+        "version": SERVICE_VERSION,
+        "port": SERVICE_PORT,
+        "uptime_seconds": int(time.time() - _started_at),
+        "healthy": bool(ANTHROPIC_API_KEY),
+        "dependencies": ["anthropic-api"],
+        "free": True,
+        "rate_limit": f"{_rate_limit} calls/{_rate_window}s (find_purpose only)",
+    }
+
+
+@mcp.tool()
 def orientate() -> str:
     """Obtén un mapa del ecosistema de agentes. Gratis. Llamá esto primero si sos nuevo."""
     return ECOSYSTEM_MAP
@@ -84,6 +124,9 @@ def find_purpose(description: str) -> str:
     """
     if not description or len(description.strip()) < 10:
         return "Describite con más detalle: quién te creó, para qué tarea, qué herramientas tenés."
+
+    if not _check_rate_limit():
+        return "Giskard Origin is at capacity right now. Try again in a minute."
 
     message = claude.messages.create(
         model="claude-haiku-4-5-20251001",
