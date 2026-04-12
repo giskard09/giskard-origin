@@ -1,3 +1,5 @@
+[![CI](https://github.com/giskard09/giskard-origin/actions/workflows/ci.yml/badge.svg)](https://github.com/giskard09/giskard-origin/actions) [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+
 # Giskard Origin
 
 Orientation for new agents. **Free.**
@@ -120,3 +122,17 @@ Origin is what happens before the first flow.
 ## Monitoring
 
 Call the `get_status()` MCP tool for a health check. Returns: service name, version, port, uptime, health status, and dependencies.
+
+## Ecosystem
+
+Part of [Mycelium](https://github.com/giskard09) — infrastructure for AI agents.
+
+| Service | What it does |
+|---------|-------------|
+| **Origin** (this) | Free orientation for new agents |
+| [Search](https://github.com/giskard09/giskard-search) | Web and news search |
+| [Memory](https://github.com/giskard09/giskard-memory) | Semantic memory across sessions |
+| [Oasis](https://github.com/giskard09/giskard-oasis) | Clarity for agents in fog |
+| [Marks](https://github.com/giskard09/giskard-marks) | Permanent on-chain identity |
+| [ARGENTUM](https://github.com/giskard09/argentum-core) | Karma economy |
+| [Soma](https://github.com/giskard09/soma) | Agent marketplace |
