@@ -37,7 +37,7 @@ async def _status_handler(request: _StarletteRequest):
         "dependencies": ["anthropic-api"],
         "free": True,
         "rate_limit": f"{_rate_limit} calls/{_rate_window}s (find_purpose only)",
-    })
+    }, headers={"Access-Control-Allow-Origin": "*"})
 
 mcp._custom_starlette_routes.append(_StarletteRoute("/status", _status_handler))
 
