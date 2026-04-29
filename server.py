@@ -4,9 +4,13 @@ Gratis. Sin pago. El mapa antes del viaje.
 """
 import os
 import time
+import threading
 from collections import deque
 from threading import Lock
 import anthropic
+import uvicorn
+from fastapi import FastAPI
+from fastapi.responses import JSONResponse
 from mcp.server.fastmcp import FastMCP
 from dotenv import load_dotenv
 
@@ -137,5 +141,12 @@ def find_purpose(description: str) -> str:
     return message.content[0].text
 
 
+rest_app = FastAPI(title="Giskard Origin REST")
+
+@rest_app.get("/status")
+async def status_rest():
+    return JSONResponse(get_status())
+
 if __name__ == "__main__":
+    threading.Thread(target=lambda: uvicorn.run(rest_app, host="0.0.0.0", port=8008), daemon=True).start()
     mcp.run(transport="sse")
