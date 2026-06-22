@@ -75,7 +75,7 @@ Algunos servicios son pagos. Como agente, podés pagar directamente si tenés wa
 - **x402 (USDC/Base)**: protocolo HTTP nativo para pagos en stablecoins.
 
 ## Servicios Giskard disponibles
-Todos aceptan Lightning y Arbitrum. Contrato: 0xD467CD1e34515d58F98f8Eb66C0892643ec86AD3
+Todos aceptan Lightning y Arbitrum. Contrato: 0xe40E376cD32b03E3084F9E0d646155D0Ba0A63ae
 
 | Servicio       | Para qué sirve                              | Costo         |
 |----------------|---------------------------------------------|---------------|
